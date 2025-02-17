@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera Stream</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+</head>
+<body>
+    <p id="connection">disconnected</p>
+
+    <h1>Camera Stream</h1>
+    <img id="video" src="" width="640" height="480" alt="Camera Stream">
+    
+    <script type="text/javascript">
+        // Connect to the Socket.IO server
+        const socket =  io();
+
+        // Listen for 'connect' events and update the connection status
+        socket.on('connect', function() {
+            document.getElementById('connection').innerText = 'connected';
+            document.getElementById('connection').style.color = 'green';
+        });
+        socket.on('disconnect', function() {
+            document.getElementById('connection').innerText = 'disconnected';
+            document.getElementById('connection').style.color = 'red';
+        });
+        
+        // Listen for 'new_frame' events and update the image
+        socket.on('camera_frame', function(data) {
+            document.getElementById('video').src = 'data:image/jpeg;base64,' + data;
+        });
+    </script>
+</body>
+</html>
