@@ -16,7 +16,8 @@ def main():
 	pub.bind("tcp://*:5556")  
 
 	# color range for object
-	color = (182, 78, 71) # in rgb
+	color = np.array([ 20.02,  49.74, 102.66]) # in rgb
+	color_lab = np.array([ 69.42, 149.31, 156.84])
 
 	try:
 		while True:
@@ -33,23 +34,17 @@ def main():
 			frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
 			time_decoded = time.time()
 
-
-			# find the center of the orange blob
-			# hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-			# grid = np.indices(hsv.shape[:2]) 
-			# mask = cv2.inRange(hsv, color_lower, color_upper)
-			# center = np.mean(grid[:, mask > 0], axis=1)
-			# center = tuple(map(float, center[::-1] / frame.shape[:2][::-1]))
-			# time_detection = time.time()
-
-
 			# find weighted average by color distance
 			grid = np.indices(frame.shape[:2]) 
-			weights = np.linalg.norm(frame - color, axis=2)
-			weights = 1 / (weights + 1)
-			center = np.average(grid, weights=weights, axis=(1, 2))
-			print(center)
-			center = center[::-1] / frame.shape[:2][::-1]
+			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2Lab)
+			# weights = frame/color_lab
+			weights = 1/(frame - color_lab)
+			weights = np.mean(weights[:,:,1:], 2)
+			weights -= np.min(weights)
+			weights = weights**10
+			y = np.average(grid[0], weights=weights)
+			x = np.average(grid[1], weights=weights)
+			center = (x / frame.shape[1], y / frame.shape[0])
 			time_detection = time.time()
 
 			data = {
@@ -63,7 +58,10 @@ def main():
 				"center": center
 			}
 			pub.send_string("detection " + json.dumps(data))			
-			
+	
+	except Exception as e:
+		throw(e)
+
 	finally:
 		sub.close()
 		context.term()
