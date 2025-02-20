@@ -16,11 +16,10 @@
     </select> <br>
     Frequency: <samp id="frequency">NA</samp> Hz <br>
     Total Latency: <samp id="time">NA</samp> ms <br>
-    Times: 
-    <div style="text-align: center;">
+    Steps: 
+    <pre>
         <samp id="times"></samp>
-    </div> 
-
+    </pre>
 		
     <script type="text/javascript">
         // Connect to the Socket.IO server
@@ -48,6 +47,7 @@
             types.push(type);
             types = [...new Set(types)];
             const typeDropdown = document.getElementById('type');
+            selection = typeDropdown.value;
             typeDropdown.innerHTML = '';
             types.forEach((type) => {
                 const option = document.createElement('option');
@@ -55,7 +55,7 @@
                 option.text = type;
                 typeDropdown.add(option);
             });
-
+            typeDropdown.value = selection;
             
             // update last
             last_current = last[type];

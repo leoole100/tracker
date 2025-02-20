@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<header>
+    <h1>Detection</h1>
+    <p id="connection">disconnected</p>
+</header>
+<body>
+    <div style="position:relative;"></div>
+        <img id="video" style="position:absolute; top: 0; left: 0;">
+        <canvas id="overlay" style="position:absolute; top: 0; left: 0;"></canvas>
+    </div>
+    <br>
+    Last Frame: <samp id="time">NA</samp><br>
+    Center: <samp id="center">NA</samp>
+    
+    <script type="text/javascript">
+        // Connect to the Socket.IO server
+        const socket =  io();
+
+        // Listen for 'connect' events and update the connection status
+        socket.on('connect', function() {
+            document.getElementById('connection').innerText = 'connected';
+            document.getElementById('connection').style.color = 'green';
+        });
+        socket.on('disconnect', function() {
+            document.getElementById('connection').innerText = 'disconnected';
+            document.getElementById('connection').style.color = 'red';
+        });
+        
+        // Listen for 'new_frame' events and update the image
+        socket.on('camera_frame', function(data) {
+            const parsedData = JSON.parse(data);
+            document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.image;
+            
+            const date = new Date(parsedData.time * 1000);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            const formattedTime = `${hours}:${minutes}:${seconds}`;
+            
+            document.getElementById('time').innerText = formattedTime;
+        });
+
+        socket.on('detection', function(data){
+            const parsedData = JSON.parse(data);
+            const centerX = parsedData.center[0].toFixed(2);
+            const centerY = parsedData.center[1].toFixed(2);
+            document.getElementById("center").innerText = `${centerX}, ${centerY}`;
+
+            const canvas = document.getElementById('overlay');
+            const context = canvas.getContext('2d');
+            const video = document.getElementById('video');
+
+            // Clear the canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Set canvas dimensions to match the video element
+            canvas.width = video.clientWidth;
+            canvas.height = video.clientHeight;
+
+            // Calculate the center coordinates in pixels
+            const centerXPixel = centerX * canvas.width;
+            const centerYPixel = centerY * canvas.height;
+
+            context.strokeStyle = 'red';
+            context.fillStyle = 'red';
+
+            // Draw a rectangle from top left to bottom right
+            context.beginPath();
+            context.rect(0, 0, canvas.width, canvas.height);
+            context.lineWidth = 2;
+            context.stroke();
+
+            // Draw the center point
+            context.beginPath();
+            context.arc(centerXPixel, centerYPixel, 5, 0, 2 * Math.PI, false);
+            context.fill();
+            context.stroke();
+        })
+    </script>
+</body>
+</html>
