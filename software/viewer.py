@@ -1,7 +1,7 @@
 import zmq
 import threading
 import base64
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, send_file
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
@@ -34,7 +34,7 @@ def index():
 
 @app.route('/<path:path>')
 def sendstuff(path):
-	return send_from_directory('static/', path)
+	return send_from_directory('static/', path, max_age=0)
 
 if __name__ == '__main__':
 		# Start the ZeroMQ subscriber in a background thread

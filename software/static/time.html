@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Times</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<header>
+    <h1>Time analysis</h1>
+    <p id="connection">disconnected</p>
+</header>
+<body>
+
+    Type: 
+    <select id="type">
+    </select> <br>
+    Frequency: <samp id="frequency">NA</samp> Hz <br>
+    Total Latency: <samp id="time">NA</samp> ms <br>
+    Times: 
+    <div style="text-align: center;">
+        <samp id="times"></samp>
+    </div> 
+
+		
+    <script type="text/javascript">
+        // Connect to the Socket.IO server
+        const socket =  io();
+
+        // Listen for 'connect' events and update the connection status
+        socket.on('connect', function() {
+            document.getElementById('connection').innerText = 'connected';
+            document.getElementById('connection').style.color = 'green';
+        });
+        socket.on('disconnect', function() {
+            document.getElementById('connection').innerText = 'disconnected';
+            document.getElementById('connection').style.color = 'red';
+        });
+       
+        types = [];
+        last = {}
+
+        // Listen for 'message' events and update the content accordingly
+        socket.onAny((type, data) => {
+            received = Date.now() / 1000;
+            const parsedData = JSON.parse(data);
+            
+            // Update the type dropdown
+            types.push(type);
+            types = [...new Set(types)];
+            const typeDropdown = document.getElementById('type');
+            typeDropdown.innerHTML = '';
+            types.forEach((type) => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.text = type;
+                typeDropdown.add(option);
+            });
+
+            
+            // update last
+            last_current = last[type];
+            last[type] = received;
+        
+            if (typeDropdown.value !== type) {
+                return;
+            }
+
+            document.getElementById('frequency').innerText = (1/(received-last_current)).toPrecision(2);
+
+            document.getElementById('time').innerText = ((received-parsedData.time)*1000).toPrecision(2);
+            // document.getElementById('times').innerHTML = parsedData.times;
+            let timesHtml = '';
+            for (const [key, value] of Object.entries(parsedData.times)) {
+                timesHtml += `${key}: ${(value * 1e3).toPrecision(2)} ms<br>`;
+            }
+            document.getElementById('times').innerHTML = timesHtml;
+
+        });
+    </script>
+</body>
+</html>
