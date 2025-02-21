@@ -65,7 +65,7 @@
                 return;
             }
 
-            document.getElementById('frequency').innerText = (1/(received-last_current)).toPrecision(2);
+            document.getElementById('frequency').innerText = (1/(received-last_current)).toPrecision(3);
 
             document.getElementById('time').innerText = ((received-parsedData.time)*1000).toPrecision(2);
             // document.getElementById('times').innerHTML = parsedData.times;

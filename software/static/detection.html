@@ -16,7 +16,8 @@
     </div>
     <br>
     Last Frame: <samp id="time">NA</samp><br>
-    Center: <samp id="center">NA</samp>
+    Center: <samp id="center">NA</samp><br>
+    Size: <samp id="size">NA</samp>
     
     <script type="text/javascript">
         // Connect to the Socket.IO server
@@ -48,9 +49,11 @@
 
         socket.on('detection', function(data){
             const parsedData = JSON.parse(data);
-            const centerX = parsedData.center[0].toFixed(2);
-            const centerY = parsedData.center[1].toFixed(2);
-            document.getElementById("center").innerText = `${centerX}, ${centerY}`;
+            const centerX = parsedData.center[0];
+            const centerY = parsedData.center[1];
+            const size = parsedData.size;
+            document.getElementById("center").innerText = `${centerX.toFixed(2)}, ${centerY.toFixed(2)}`;
+            document.getElementById("size").innerText = size.toFixed(2);
 
             const canvas = document.getElementById('overlay');
             const context = canvas.getContext('2d');
@@ -69,12 +72,6 @@
 
             context.strokeStyle = 'red';
             context.fillStyle = 'red';
-
-            // Draw a rectangle from top left to bottom right
-            context.beginPath();
-            context.rect(0, 0, canvas.width, canvas.height);
-            context.lineWidth = 2;
-            context.stroke();
 
             // Draw the center point
             context.beginPath();

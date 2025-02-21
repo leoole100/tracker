@@ -6,17 +6,21 @@ import numpy as np
 import time
 
 def center_of_mass(frame, color=np.array([ 69.42, 149.31, 156.84])):
-	frame_lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)	# 2 ms
+	frame_lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 	diff = frame_lab.astype(np.float32) - color.astype(np.float32)	# 10 ms
 	weights = np.sum(diff[:,:,1:], axis=2) # 10 ms
-	weights = np.exp(weights) # 6 ms
+	weights = np.exp(weights)
 	weights -= np.min(weights)
 	total = np.sum(weights)
-	indices = np.indices(weights.shape) # 2 ms
-	x = np.sum(indices[1] * weights) / total # 3 ms
-	y = np.sum(indices[0] * weights) / total # 3 sm
+	indices = np.indices(weights.shape)
+	x = np.sum(indices[1] * weights) / total
+	y = np.sum(indices[0] * weights) / total
+	var_x = np.sum(weights * ((indices[1] - x) ** 2)) / total
+	var_y = np.sum(weights * ((indices[0] - y) ** 2)) / total
+	spread = np.sqrt(var_x + var_y)
+    
 
-	return weights, (x, y)
+	return weights, (x, y), spread
 
 
 def main():
@@ -50,8 +54,9 @@ def main():
 
 			# find weighted average by color distance
 			frame_scaled = cv2.resize(frame, (frame.shape[0]//2, frame.shape[1]//2))
-			_, c = center_of_mass(frame_scaled)
+			_, c, s = center_of_mass(frame_scaled)
 			center = (c[0]/frame_scaled.shape[1], c[1]/frame_scaled.shape[0])
+			spread = s/frame_scaled.shape[1]
 			time_detection = time.time()
 
 			data = {
@@ -62,7 +67,8 @@ def main():
 					"decoded": time_decoded - time_received,
 					"detection": time_detection - time_decoded
 				},
-				"center": center
+				"center": center,
+				"size":  spread
 			}
 			pub.send_string("detection " + json.dumps(data))			
 	
