@@ -5,10 +5,24 @@ import base64
 import numpy as np
 import time
 
+def center_of_mass(frame, color=np.array([ 69.42, 149.31, 156.84])):
+	frame_lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+	diff = frame_lab.astype(np.float32) - color.astype(np.float32)
+	weights = np.sum(diff[:,:,1:], axis=2)
+	weights = np.exp(weights)
+	weights -= np.min(weights)
+	total = np.sum(weights)
+	indices = np.indices(weights.shape)
+	x = np.sum(indices[1] * weights) / total
+	y = np.sum(indices[0] * weights) / total
+
+	return weights, (x, y)
+
 
 def main():
 	context = zmq.Context()
 	sub = context.socket(zmq.SUB)
+	sub.setsockopt(zmq.CONFLATE, 1) # take most recent
 	sub.connect("tcp://localhost:5555") # frame publisher
 	sub.setsockopt_string(zmq.SUBSCRIBE, "camera_frame")
 
@@ -35,16 +49,8 @@ def main():
 			time_decoded = time.time()
 
 			# find weighted average by color distance
-			grid = np.indices(frame.shape[:2]) 
-			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2Lab)
-			# weights = frame/color_lab
-			weights = 1/(frame - color_lab)
-			weights = np.mean(weights[:,:,1:], 2)
-			weights -= np.min(weights)
-			weights = weights**10
-			y = np.average(grid[0], weights=weights)
-			x = np.average(grid[1], weights=weights)
-			center = (x / frame.shape[1], y / frame.shape[0])
+			_, c = center_of_mass(frame)
+			center = (c[0]/frame.shape[1], c[1]/frame.shape[0])
 			time_detection = time.time()
 
 			data = {

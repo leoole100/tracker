@@ -9,17 +9,18 @@ socketio = SocketIO(app)
 
 def main():
 	context = zmq.Context()
-	socket = context.socket(zmq.SUB)
-	socket.connect("tcp://localhost:5555")
-	socket.connect("tcp://localhost:5556")
-	socket.setsockopt_string(zmq.SUBSCRIBE, "")
+	sub = context.socket(zmq.SUB)
+	sub.connect("tcp://localhost:5555")
+	sub.connect("tcp://localhost:5556")
+	sub.setsockopt(zmq.CONFLATE, 1) # take most recent
+	sub.setsockopt_string(zmq.SUBSCRIBE, "")
 
-	socketio.on_event('message', lambda data: socket.send_string(data))
+	socketio.on_event('message', lambda data: sub.send_string(data))
 	
 	try:
 		while True:
 			# Wait for a message from the publisher
-			message = socket.recv_string()
+			message = sub.recv_string()
 			try:
 					topic, data = message.split(" ", 1)
 			except ValueError:
@@ -29,7 +30,7 @@ def main():
 			socketio.emit(topic, data)
 
 	finally:
-		socket.close()
+		sub.close()
 		context.term()
 
 @app.route('/')
