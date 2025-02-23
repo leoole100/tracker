@@ -15,9 +15,12 @@
         <canvas id="overlay" style="position:absolute; top: 0; left: 0;"></canvas>
     </div>
     <br>
-    Last Frame: <samp id="time">NA</samp><br>
+    Last: <samp id="time">NA</samp><br>
     Center: <samp id="center">NA</samp><br>
-    Size: <samp id="size">NA</samp>
+    Size: <samp id="size">NA</samp><br>
+    Color: <samp id="color">NA</samp><br>
+    Contrast: <samp id="contrast">NA</samp> db<br>
+    Threshold: <input type="number" min="-1000" max="0" value="-200" class="slider" id="threshold"> db<br>
     
     <script type="text/javascript">
         // Connect to the Socket.IO server
@@ -37,7 +40,18 @@
         socket.on('camera_frame', function(data) {
             const parsedData = JSON.parse(data);
             document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.image;
-            
+        });
+
+        socket.on('detection', function(data){
+            const parsedData = JSON.parse(data);
+            const centerX = parsedData.center[0];
+            const centerY = parsedData.center[1];
+            document.getElementById("center").innerText = `${centerX.toFixed(2)}, ${centerY.toFixed(2)}`;
+            document.getElementById("size").innerText = parsedData.size.toFixed(2);
+            document.getElementById("contrast").innerText = parsedData.contrast.toFixed(2);
+            // document.getElementById("color").innerText = parsedData.color;
+            // document.getElementById("color").style.color = `rgb(${parsedData.color})`;
+
             const date = new Date(parsedData.time * 1000);
             const hours = date.getHours().toString().padStart(2, '0');
             const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -45,15 +59,6 @@
             const formattedTime = `${hours}:${minutes}:${seconds}`;
             
             document.getElementById('time').innerText = formattedTime;
-        });
-
-        socket.on('detection', function(data){
-            const parsedData = JSON.parse(data);
-            const centerX = parsedData.center[0];
-            const centerY = parsedData.center[1];
-            const size = parsedData.size;
-            document.getElementById("center").innerText = `${centerX.toFixed(2)}, ${centerY.toFixed(2)}`;
-            document.getElementById("size").innerText = size.toFixed(2);
 
             const canvas = document.getElementById('overlay');
             const context = canvas.getContext('2d');
@@ -61,6 +66,14 @@
 
             // Clear the canvas
             context.clearRect(0, 0, canvas.width, canvas.height);
+
+            if(!parsedData.valid){
+                document.getElementById("contrast").style.color = "red"
+                return
+            }
+            else{
+                document.getElementById("contrast").style.color = "green"
+            }
 
             // Set canvas dimensions to match the video element
             canvas.width = video.clientWidth;
@@ -70,15 +83,25 @@
             const centerXPixel = centerX * canvas.width;
             const centerYPixel = centerY * canvas.height;
 
-            context.strokeStyle = 'red';
-            context.fillStyle = 'red';
+            context.strokeStyle = 'black';
 
-            // Draw the center point
+            // draw a cross
             context.beginPath();
-            context.arc(centerXPixel, centerYPixel, 5, 0, 2 * Math.PI, false);
-            context.fill();
+            context.moveTo(centerXPixel, 0);
+            context.lineTo(centerXPixel, canvas.height);
             context.stroke();
+            context.beginPath();
+            context.moveTo(0, centerYPixel);
+            context.lineTo(canvas.width, centerYPixel);
+            context.stroke();
+
+            
+            
         })
+
+        document.getElementById("threshold").oninput = function(){
+            socket.emit("message", "detector_setting "+JSON.stringify({ threshold: this.value}));
+        }
     </script>
 </body>
 </html>

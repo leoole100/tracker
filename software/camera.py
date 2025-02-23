@@ -26,8 +26,6 @@ def setup_camera():
 		return cap
 
 def main():
-		global running
-
 		# Set up ZeroMQ publisher
 		context = zmq.Context()
 		socket = context.socket(zmq.PUB)
@@ -35,33 +33,25 @@ def main():
 
 		cap = setup_camera()
 
-		try:
-			while True:
-				# take a frame
-				ret, frame = cap.read()
-				frame_time = time.time()
+		while True:
+			# take a frame
+			ret, frame = cap.read()
+			frame_time = time.time()
 
-				# Encode the frame as JPEG
-				ret, buffer = cv2.imencode('.jpg', frame)
-				jpg_as_text = base64.b64encode(buffer).decode('utf-8')
-				encoding_time = time.time()
-				
-				# create a json dict with times and data
-				data = {
-					"time": frame_time,
-					"times": {
-						"encoding": encoding_time - frame_time,
-					},
-					"image": jpg_as_text,
-				}
-				socket.send_string("camera_frame " + json.dumps(data))
-
-		finally:
-			# Cleanup resources
-			cap.release()
-			socket.close()
-			context.term()
-			print("Shutdown complete.")
+			# Encode the frame as JPEG
+			ret, buffer = cv2.imencode('.jpg', frame)
+			jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+			encoding_time = time.time()
+			
+			# create a json dict with times and data
+			data = {
+				"time": frame_time,
+				"times": {
+					"encoding": encoding_time - frame_time,
+				},
+				"image": jpg_as_text,
+			}
+			socket.send_string("camera_frame " + json.dumps(data))
 
 if __name__ == '__main__':
 		main()

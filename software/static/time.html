@@ -16,6 +16,8 @@
     </select> <br>
     Frequency: <samp id="frequency">NA</samp> Hz <br>
     Total Latency: <samp id="time">NA</samp> ms <br>
+    Size: <samp id="size">NA</samp> bytes <br>
+    Data Rate: <samp id="rate">NA</samp> bytes / s <br>
     Steps: <br>
     <div style="margin-left: 30px;">
         <samp id="times"></samp>
@@ -37,6 +39,8 @@
        
         types = [];
         last = {}
+
+        const byteSize = str => new Blob([str]).size;
 
         // Listen for 'message' events and update the content accordingly
         socket.onAny((type, data) => {
@@ -66,9 +70,12 @@
             }
 
             document.getElementById('frequency').innerText = (1/(received-last_current)).toPrecision(3);
+        
+            size = byteSize(data)
+            document.getElementById('size').innerText = size.toPrecision(4);
+            document.getElementById('rate').innerText = (size*(1/(received-last_current))).toPrecision(3);
+            document.getElementById('time').innerText = ((received-parsedData.time)*1000).toPrecision(4);
 
-            document.getElementById('time').innerText = ((received-parsedData.time)*1000).toPrecision(2);
-            // document.getElementById('times').innerHTML = parsedData.times;
             let timesHtml = '';
             for (const [key, value] of Object.entries(parsedData.times)) {
                 timesHtml += `${key}: ${(value * 1e3).toPrecision(2)} ms<br>`;

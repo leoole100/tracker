@@ -7,16 +7,22 @@ from flask_socketio import SocketIO
 app = Flask(__name__)
 socketio = SocketIO(app)
 
+
 def main():
 	context = zmq.Context()
 	sub = context.socket(zmq.SUB)
 	sub.connect("tcp://localhost:5555")
 	sub.connect("tcp://localhost:5556")
-	sub.setsockopt(zmq.CONFLATE, 1) # take most recent
 	sub.setsockopt_string(zmq.SUBSCRIBE, "")
 
-	socketio.on_event('message', lambda data: sub.send_string(data))
-	
+	pub = context.socket(zmq.PUB)
+	pub.bind("tcp://*:5550")
+
+	@socketio.on("message")
+	def on_message(data):
+		print(data)
+		pub.send_string(data)
+
 	try:
 		while True:
 			# Wait for a message from the publisher

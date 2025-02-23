@@ -23,7 +23,7 @@ body {
 	padding: 20px;
 }
 
-samp {
+samp, input[type=number] {
 	font-family: 'Roboto Mono', monospace;
 	font-weight: bold;
 	font-size: 1em;
