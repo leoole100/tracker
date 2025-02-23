@@ -38,8 +38,8 @@
         
         // Listen for 'new_frame' events and update the image
         socket.on('camera_frame', function(data) {
-            const parsedData = JSON.parse(data);
-            document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.image;
+            // const parsedData = JSON.parse(data);
+            // document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.image;
         });
 
         socket.on('detection', function(data){
@@ -51,6 +51,7 @@
             document.getElementById("contrast").innerText = parsedData.contrast.toFixed(2);
             // document.getElementById("color").innerText = parsedData.color;
             // document.getElementById("color").style.color = `rgb(${parsedData.color})`;
+            document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.weight;
 
             const date = new Date(parsedData.time * 1000);
             const hours = date.getHours().toString().padStart(2, '0');
@@ -83,7 +84,7 @@
             const centerXPixel = centerX * canvas.width;
             const centerYPixel = centerY * canvas.height;
 
-            context.strokeStyle = 'black';
+            context.strokeStyle = 'white';
 
             // draw a cross
             context.beginPath();

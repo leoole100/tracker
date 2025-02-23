@@ -5,11 +5,13 @@ import base64
 import numpy as np
 import time
 import math
+from functions import decode, encode
+import skimage as ski
 
-# def center_of_mass(frame, color=np.array([ 69.42, 149.31, 156.84])):
-def center_of_mass(frame, color=np.array([ 148.512, 157.9, 187.15]), w=10):
+
+def center_of_mass(frame, color=np.array([ 75*255/100, 24.7+128, 43.26+128]), w=10):
 	frame_lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
-	diff = frame_lab.astype(np.float32) - color.astype(np.float32)
+	diff = frame_lab - color.astype(frame_lab.dtype)
 	weights = np.sum(diff[:,:,1:]**2, axis=2)
 	weights = np.exp(-weights/w)
 	contrast = np.max(weights) - np.mean(weights)
@@ -23,12 +25,6 @@ def center_of_mass(frame, color=np.array([ 148.512, 157.9, 187.15]), w=10):
   
 	return weights, (x, y), spread, contrast
 
-def decode_frame(data):
-	frame = data["image"]
-	frame = base64.b64decode(frame)
-	frame = np.frombuffer(frame, dtype=np.uint8)
-	frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-	return frame
 
 def main():
 	context = zmq.Context()
@@ -42,7 +38,7 @@ def main():
 	pub = context.socket(zmq.PUB)
 	pub.bind("tcp://*:5556")  
 
-	threshold = -200
+	threshold = -100
 
 	while True:
 		# Wait for a message from the publisher
@@ -54,16 +50,16 @@ def main():
 
 		if topic == "camera_frame":
 			# decode the frame
-			frame = decode_frame(data)
+			frame = decode(data)
 			time_decoded = time.time()
 
 			# find weighted average by color distance
-			frame_scaled = cv2.resize(frame, (frame.shape[0]//2, frame.shape[1]//2))
-			_, c, s, contrast = center_of_mass(frame_scaled)
+			frame_scaled = cv2.resize(frame, (frame.shape[1]//2, frame.shape[0]//2))
+			weight, c, s, contrast = center_of_mass(frame_scaled)
 			center = (c[0]/frame_scaled.shape[1], c[1]/frame_scaled.shape[0])
 			spread = s/frame_scaled.shape[1]
 			contrast = 10*float(np.log10(contrast))
-			# color = frame_scaled[int(c[1]), int(c[0]), ::-1].tolist()
+			weight_as_text = encode(weight)
 			time_detection = time.time()
 
 			data = {
@@ -74,11 +70,11 @@ def main():
 					"decoded": time_decoded - time_received,
 					"detection": time_detection - time_decoded
 				},
+				"weight": weight_as_text,
 				"center": center,
 				"size":  spread,
 				"contrast": contrast,
-				"valid": (contrast>threshold)
-				# "color": color
+				"valid": (contrast>threshold),
 			}
 			pub.send_string("detection " + json.dumps(data))
 		
