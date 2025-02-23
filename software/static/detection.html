@@ -38,7 +38,7 @@
         
         // Listen for 'new_frame' events and update the image
         socket.on('camera_frame', function(data) {
-            // const parsedData = JSON.parse(data);
+            const parsedData = JSON.parse(data);
             // document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.image;
         });
 
@@ -47,11 +47,11 @@
             const centerX = parsedData.center[0];
             const centerY = parsedData.center[1];
             document.getElementById("center").innerText = `${centerX.toFixed(2)}, ${centerY.toFixed(2)}`;
-            document.getElementById("size").innerText = parsedData.size.toFixed(2);
+            // document.getElementById("size").innerText = parsedData.size.toFixed(2);
             document.getElementById("contrast").innerText = parsedData.contrast.toFixed(2);
             // document.getElementById("color").innerText = parsedData.color;
             // document.getElementById("color").style.color = `rgb(${parsedData.color})`;
-            document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.weight;
+            document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.mask;
 
             const date = new Date(parsedData.time * 1000);
             const hours = date.getHours().toString().padStart(2, '0');
