@@ -51,7 +51,7 @@
             document.getElementById("contrast").innerText = parsedData.contrast.toFixed(2);
             // document.getElementById("color").innerText = parsedData.color;
             // document.getElementById("color").style.color = `rgb(${parsedData.color})`;
-            document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.mask;
+            document.getElementById('video').src = 'data:image/jpeg;base64,' + parsedData.weight;
 
             const date = new Date(parsedData.time * 1000);
             const hours = date.getHours().toString().padStart(2, '0');

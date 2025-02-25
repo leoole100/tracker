@@ -22,6 +22,8 @@
     <div style="margin-left: 30px;">
         <samp id="times"></samp>
     </div>
+    Raw data: <samp id="data">NA</samp><br>
+
 		
     <script type="text/javascript">
         // Connect to the Socket.IO server
@@ -45,7 +47,6 @@
         // Listen for 'message' events and update the content accordingly
         socket.onAny((type, data) => {
             received = Date.now() / 1000;
-            const parsedData = JSON.parse(data);
             
             // Update the type dropdown
             types.push(type);
@@ -69,13 +70,15 @@
                 return;
             }
 
+            document.getElementById('data').innerText = data;
             document.getElementById('frequency').innerText = (1/(received-last_current)).toPrecision(3);
-        
             size = byteSize(data)
             document.getElementById('size').innerText = size.toPrecision(4);
             document.getElementById('rate').innerText = (size*(1/(received-last_current))).toPrecision(3);
-            document.getElementById('time').innerText = ((received-parsedData.time)*1000).toPrecision(4);
 
+            const parsedData = JSON.parse(data);
+            document.getElementById('time').innerText = ((received-parsedData.time)*1000).toPrecision(4);
+            
             let timesHtml = '';
             for (const [key, value] of Object.entries(parsedData.times)) {
                 timesHtml += `${key}: ${(value * 1e3).toPrecision(2)} ms<br>`;

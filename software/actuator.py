@@ -12,7 +12,7 @@ ser = serial.Serial('/dev/ttyACM0')
 getAngle = lambda: float(ser.readline()) # 200 us
 setAngle = lambda a: ser.write(b'T'+bytes(f"{a:f}", "ascii")+b'\n') # 300us
 
-rad_frame = math.pi/4 * np.array([1, 9/16])
+rad_frame = 1.222 * np.array([1, 9/16]) / 2
 
 def main():
 	context = zmq.Context()
