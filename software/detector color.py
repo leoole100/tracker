@@ -30,13 +30,13 @@ def main():
 	sub.connect("tcp://localhost:5555") # frame publisher
 	sub.connect("tcp://localhost:5550") # viewer
 	sub.setsockopt_string(zmq.SUBSCRIBE, "camera_frame")
-	sub.setsockopt(zmq.CONFLATE, 1) # take most recent
 	sub.setsockopt_string(zmq.SUBSCRIBE, "detector_setting")
+	sub.setsockopt(zmq.CONFLATE, 1) # take most recent
 
 	pub = context.socket(zmq.PUB)
 	pub.bind("tcp://*:5556")  
 
-	threshold = -40
+	threshold = -10
 
 	while True:
 		# Wait for a message from the publisher
@@ -52,7 +52,7 @@ def main():
 			time_decoded = time.time()
 
 			# find weighted average by color distance
-			frame_scaled = cv2.resize(frame, (frame.shape[1]//2, frame.shape[0]//2))
+			frame_scaled = cv2.resize(frame, (frame.shape[1]//3, frame.shape[0]//3))
 			weight, c, s, contrast = center_of_mass(frame_scaled)
 			center = (c[0]/frame_scaled.shape[1], c[1]/frame_scaled.shape[0])
 			spread = s/frame_scaled.shape[1]

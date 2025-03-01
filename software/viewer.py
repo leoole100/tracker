@@ -20,6 +20,7 @@ def main():
 	sub.connect("tcp://localhost:5555")
 	sub.connect("tcp://localhost:5556")
 	sub.setsockopt_string(zmq.SUBSCRIBE, "")
+	sub.setsockopt(zmq.CONFLATE, 1) # take most recent
 
 	pub = context.socket(zmq.PUB)
 	pub.bind("tcp://*:5550")
