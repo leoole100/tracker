@@ -6,32 +6,53 @@ import numpy as np
 import time
 import math
 from functions import decode, encode
-import skimage as ski
 
-def detect(frame,
-	color=cv2.cvtColor(np.uint8([[[249,166,106]]]),cv2.COLOR_RGB2LAB)[0,0],
-	w = [128, 10, 10],
-	k = np.ones((5,5))
+def detect_cicle(img, 
+	min_circularity=0.5,
+	min_radius=1, 
+	lower = np.array([  8, 130, 190]), 
+	upper = np.array([ 12, 216, 246])
 ):
-	frame_lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
-	mask = cv2.inRange(frame_lab, color-w, color+w)
-	mask = cv2.erode(mask, k, iterations=2)
-	mask = cv2.dilate(mask, k, iterations=2)
+	img = cv2.GaussianBlur(img, (11, 11), 0)
+	img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+	mask = cv2.inRange(img, lower, upper)
+	mask = cv2.erode(mask, None, iterations=2)
+	mask = cv2.dilate(mask, None, iterations=2)
 
-	cont, hir = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
-	if len(cont) == 0:
-		return frame, (0.5, 0.5), -1000.
+	cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
+			cv2.CHAIN_APPROX_SIMPLE)[0]
 
-	cnt = max(cont, key=cv2.contourArea)
-	M = cv2.moments(cnt)
-	c = [M['m10']/M['m00']/frame.shape[1], M['m01']/M['m00']/frame.shape[0]]
+	best_contour = None
+	max_circularity = -1
 
-	signal = np.sum((cv2.mean(frame_lab, mask)[:3] - color)**2)
-	signal = -10*math.log10(signal)
+	for c in cnts:
+		# Calculate area and perimeter
+		area = cv2.contourArea(c)
+		perimeter = cv2.arcLength(c, closed=True)
+
+		# Skip small contours to avoid division by zero
+		if perimeter == 0 or area < 3*min_radius**2:
+			continue
+
+		# Calculate circularity
+		circularity = (4 * np.pi * area) / (perimeter ** 2)
+
+		# Filter by circularity and radius
+		(x, y), radius = cv2.minEnclosingCircle(c)
+		if circularity > min_circularity and radius > min_radius:
+			# Track the most circular contour (or use area as a tiebreaker)
+			if circularity > max_circularity:
+				max_circularity = circularity
+				best_contour = c
+
+	if best_contour is not None:
+		color = img[mask.astype(bool)].mean(axis=0)
+		print(color, "\t", max_circularity, area)
+		return ((x/img.shape[1], y/img.shape[0]), radius)
+
+	return False
 	
-	return (1 + mask[:,:,None]/255)*frame[:,:,::]/2, c, signal
-
 def main():
 	context = zmq.Context()
 	sub = context.socket(zmq.SUB)
@@ -62,22 +83,34 @@ def main():
 			if frame.shape[0] == 0:
 				break
 
-			mask, c, signal = detect(frame)
-			time_detection= time.time()
+			r = detect_cicle(frame)
+			time_detection = time.time()
 
-			data = {
-				"time": data["time"],
-				"times": {
-					**data["times"],
-					"received": time_received - data["time"],
-					"decoded": time_decoded - time_received,
-					"detection": time_detection - time_decoded
-				},
-				"center": c,
-				"contrast": signal,
-				"valid": (signal>threshold),
-				"mask": encode(mask)
-			}
+			if r:
+				data = {
+					"time": data["time"],
+					"times": {
+						**data["times"],
+						"received": time_received - data["time"],
+						"decoded": time_decoded - time_received,
+						"detection": time_detection - time_decoded
+					},
+					"center": r[0],
+					"size": r[1],
+					"valid": True
+				}
+			else:
+				data = {
+					"time": data["time"],
+					"times": {
+						**data["times"],
+						"received": time_received - data["time"],
+						"decoded": time_decoded - time_received,
+						"detection": time_detection - time_decoded
+					},
+					"valid": False
+				}
+
 			pub.send_string("detection " + json.dumps(data))
 		
 		elif topic == "detector_setting":

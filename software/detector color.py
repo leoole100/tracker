@@ -6,7 +6,6 @@ import numpy as np
 import time
 import math
 from functions import decode, encode
-import skimage as ski
 
 def center_of_mass(frame, 
 	color=cv2.cvtColor(np.uint8([[[247,145,89]]]),cv2.COLOR_RGB2LAB)[0,0],
@@ -31,8 +30,8 @@ def main():
 	sub.connect("tcp://localhost:5555") # frame publisher
 	sub.connect("tcp://localhost:5550") # viewer
 	sub.setsockopt_string(zmq.SUBSCRIBE, "camera_frame")
+	sub.setsockopt(zmq.CONFLATE, 1) # take most recent
 	sub.setsockopt_string(zmq.SUBSCRIBE, "detector_setting")
-	# sub.setsockopt(zmq.CONFLATE, 1) # take most recent
 
 	pub = context.socket(zmq.PUB)
 	pub.bind("tcp://*:5556")  

@@ -5,6 +5,12 @@ from flask import Flask, render_template, send_from_directory, send_file
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
+
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
+
 socketio = SocketIO(app)
 
 

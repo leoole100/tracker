@@ -28,8 +28,8 @@ def main():
 		socket = context.socket(zmq.PUB)
 		socket.bind("tcp://*:5555")  # Bind to port 5555
 
-		# cap = cv2.VideoCapture(0)
-		cap = cv2.VideoCapture(2)
+		cap = cv2.VideoCapture(0)
+		# cap = cv2.VideoCapture(2)
 
 
 		cap = setup_camera(cap)
