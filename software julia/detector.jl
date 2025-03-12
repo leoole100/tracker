@@ -1,8 +1,6 @@
 cd(@__DIR__)
 include("camera.jl")
-using ImageIO, FFTW
-
-start_camera()
+using ImageIO
 
 # %%
 
@@ -24,7 +22,7 @@ w = mean(diff_hsv.^2 ./ hsv_var, dims=1)[1, :, :]
 krn =  Kernel.gaussian(1)
 
 function find_center(f)
-	f_small = imresize(f, (120, 160))
+	f_small .= imresize(f, (120, 160))
 	f_hsv .= channelview(HSV.(f_small)) ./ [360, 1, 1]
 	diff_hsv .= f_hsv.-hsv_mean
 	w .= -mean(diff_hsv.^2 ./ hsv_var, dims=1)[1, :, :]
@@ -36,7 +34,7 @@ function find_center(f)
 end
 
 print(find_center(f))
-mosaic(Gray.(w/maximum(w)))
+Gray.(w/maximum(w))
 
 
 # @btime find_center(f);

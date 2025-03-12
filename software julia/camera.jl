@@ -47,3 +47,5 @@ function close_camera()
     c.close()
     """
 end
+
+start_camera()
