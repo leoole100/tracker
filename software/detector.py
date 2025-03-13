@@ -20,8 +20,7 @@ class Detector():
 		self.w = np.mean(self.diff**2 / self.std, axis=2)
 		self.w = np.exp(-self.w)
 		amax = np.unravel_index(self.w.argmax(), self.w.shape)
-		snr = self.w[amax] / np.mean(self.w)
 		return {
       		"center": (np.array(amax)/np.array(self.w.shape))[::-1],
-        	"snr": snr
+			"signal": self.w[amax]
 		}

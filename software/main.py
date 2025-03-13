@@ -16,17 +16,17 @@ Scale = 0.415
 P = 0.3
 f = c()
 a = pi
-m(a)
+# m(a)
 def loop():
     global a
     global f
     f = c()
     det = d(f)
-    print(det["snr"])
-    if det["snr"] < 10000:
+    print(det["signal"])
+    if det["signal"] > 1e-6:
         error = det["center"][1] - 0.5
         a += error*Scale*P
-        m(a)
+        # m(a)
     
 def run():
     while True:
