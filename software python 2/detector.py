@@ -1,6 +1,9 @@
 # %%
-import cv2
 import numpy as np
+import numpy as np
+from  base64 import b64decode, b64decode
+import json, time, gc, zmq, cv2, os, sys
+os.chdir(sys.path[0])
 
 class Detector():
 	size = (160, 120)
@@ -19,4 +22,44 @@ class Detector():
 		self.w = np.exp(self.w)
 		amax = np.unravel_index(self.w.argmax(), self.w.shape)
 		snr = self.w[amax] / np.mean(self.w)
-		return amax[::-1], snr
+		return (np.array(amax)/np.array(self.w.shape))[::-1], snr
+
+# %%
+
+
+
+# %%
+def main():
+	cntx = zmq.Context()
+	pub = cntx.socket(zmq.PUB)
+	pub.bind("tcp://*:5002")
+	sub = cntx.socket(zmq.SUB)
+	sub.setsockopt_string(zmq.SUBSCRIBE, "camera")
+	sub.connect("tcp://localhost:5001")
+	sub.setsockopt(zmq.CONFLATE, 1)
+	
+	d = Detector()
+	 
+	while True:
+		message = sub.recv_string()
+		gc.disable()
+		topic, data = message.split(" ", 1)
+		data = json.loads(data)
+	
+		f = np.frombuffer(b64decode(data["buff"]), data["dtype"])
+		f.shape = data["shape"]
+  
+		c, s = d(f)
+  
+		data = {
+			"time": data["time"],
+			"center": c,
+			"snr": s
+		}		
+		pub.send_string("detection" + json.dumps("data"))
+		gc.enable()
+		gc.collect()
+
+# %%
+if __name__ == "__main__":
+	main()
