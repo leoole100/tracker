@@ -17,10 +17,11 @@ f = c()
 a = pi
 tracking = False
 m(a)
+error = 0
 
 # 5 ms
 def loop():
-    global a, f, tracking
+    global a, f, tracking, error
     f = c()
     det = d(f)
     if (tracking and det["signal"] > Threshold) or (not tracking and det["signal"] > Threshold*hysteresis):
@@ -30,11 +31,18 @@ def loop():
         tracking = True
     else:
         tracking = False
-    print(tracking, det["signal"], a)
+    return {
+        **det,
+        "tracking": tracking,
+        "error": error,
+        "a": a
+    }
     
 def run():
     while True:
         loop()
 
-run()
+#%%
+if __name__ == '__main__':
+    run()
 # %%
