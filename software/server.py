@@ -24,44 +24,41 @@ def sendstuff(path):
 
 # %%
 
-def tracker(q: Queue):
-    import tracker
-    while True:
-        tracker.loop()
-        if not q.full():
-            q.put(tracker.f)
+def send_messages():
+    import zmq
+    context = zmq.Context()
+    sub = context.socket(zmq.SUB)
+    sub.connect("tcp://lab.local:5001")
+    sub.connect("tcp://lab.local:5002")
+    sub.setsockopt_string(zmq.SUBSCRIBE, "")
+    
+    try:
+        while True:
+            # Wait for a message from the publisher
+            message = sub.recv_string()
+            try:
+                    topic, data = message.split(" ", 1)
+            except ValueError:
+                    continue  # Skip if message format is not as expected
+            
+            # Emit the frame to all connected web clients via SocketIO
+            socketio.emit(topic, data)
 
-def send_frames(q: Queue):
-    import cv2, base64, time
-    while True:
-        f = q.get()
-        ret, buffer = cv2.imencode('.jpg', f[...,::-1])
-        socketio.emit("frame",base64.b64encode(buffer).decode('utf-8'))
-        time.sleep(0.1)
+    finally:
+        sub.close()
+        context.term()
 
 def server():
     # Run the Flask application with SocketIO
     socketio.run(app, host='0.0.0.0', port=8080)
 
-# %%
-    
-try:
-    frames = Queue(2)
+# %%    
+print("starting send frames")
+sub_thread = Thread(target=send_messages, name="ws")
+sub_thread.start()
 
-    print("starting send frames")
-    sub_thread = Thread(target=send_frames, name="send frames", args=(frames,))
-    sub_thread.start()
-
-    print("starting tracker")
-    tracker_process = Process(target=tracker, args=(frames,), name="tracker")
-    tracker_process.start()
-    
-    print("starting server")
-    server_thread = Thread(target=server, name="server")
-    server_thread.start()
-
-
-except:
-    tracker_process.kill()
+print("starting server")
+server_thread = Thread(target=server, name="server")
+server_thread.start()
 
 # %%

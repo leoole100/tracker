@@ -9,7 +9,7 @@ d = Detector()
 
 # %%
 # 8 m
-Threshold = 1e-5
+Threshold = 1e-70
 hysteresis = 10
 Scale = 0.415
 P = 0.2

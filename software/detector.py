@@ -22,6 +22,6 @@ class Detector():
 		self.w = np.exp(-self.w)
 		amax = np.unravel_index(self.w.argmax(), self.w.shape)
 		return {
-      		"center": (np.array(amax)/np.array(self.w.shape))[::-1],
+      		"center": (np.array(amax)/np.array(self.w.shape))[::-1].tolist(),
 			"signal": self.w[amax]
 		}
