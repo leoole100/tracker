@@ -1,3 +1,4 @@
+# %%
 import time
 def measure_fps(f:callable, N=100):
     start = time.time()
