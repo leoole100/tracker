@@ -7,5 +7,3 @@ The architecture are multiple scripts that subscribe and publish streams using [
 This was [implemented in python](software%20python/) for a 30 fps USB camera.
 
 As this is not enough to reliably track movement of a fast moving ball through bounces a new (simpler) architecture in julia is [implemented](software%20julia/) to run at 120 fps on a CSI camera.
-
-A system overview is here: ![](overview.svg)
