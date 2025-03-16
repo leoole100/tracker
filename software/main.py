@@ -1,6 +1,5 @@
 #%%
 from tools import *
-from matplotlib.pyplot import imshow
 import numpy as np
 from math import pi, cos
 import json
