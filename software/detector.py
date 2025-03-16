@@ -1,12 +1,11 @@
 # %%
 import numpy as np
 import numpy as np
-from  base64 import b64decode, b64decode
-import json, time, gc, zmq, cv2, os, sys
+import cv2
 
 class Detector():
 	# size = (160, 120)
-	size = (40, 30)
+	size = (80, 60)
 	def __init__(self):
 		template = cv2.imread("../ball.png")
 		template_lab = cv2.cvtColor(template, cv2.COLOR_BGR2HSV)
@@ -25,35 +24,3 @@ class Detector():
       		"center": (np.array(amax)/np.array(self.w.shape))[::-1].tolist(),
 			"signal": self.w[amax]
 		}
-#%%
-from queue import Queue, Empty # Thread save queue (not interprocess)
-from threading import Thread
-
-class DetectorThread():
-    def __init__(self, camera):
-        self.output = Queue(1)
-        self.running = True
-        self.cam = camera
-        self.detector = Detector()
-        self.thread = Thread(target=self.task)
-        self.thread.start()
-    
-    def task(self):
-        while self.running:
-            t = self.detector(self.cam())
-
-            # empty queue if not used
-            try: self.output.get_nowait()
-            except Empty: pass
-            self.output.put(t)
-
-    def stop(self):
-        self.running = False
-        self.thread.join()
-        self.cam.__del__()
-
-    def __del__(self):
-        self.stop()
-
-    def __call__(self):
-        if self.running: return self.output.get()

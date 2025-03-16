@@ -2,8 +2,8 @@
 import serial, math
 
 class Motor():
-	def __init__(self):
-		self.ser = serial.Serial('/dev/ttyACM0')
+	def __init__(self, port=None):
+		self.ser = serial.Serial(port)
 
 	# 250 us
 	def __call__(self, a:float):

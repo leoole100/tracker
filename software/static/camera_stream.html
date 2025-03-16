@@ -5,36 +5,10 @@
     <script src="socket.io.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
-<header>
-    <p id="connection">disconnected</p>
-</header>
 <body>
     <h1>Camera Stream</h1>
     <div style="justify-content: center; display: flex;">
-        <img id="video" src=""  alt="Camera Stream">
+        <img id="video" src="/video_feed"  alt="Camera Stream">
     </div>
-    <br>
-    Last Frame: <samp id="time">NA</samp>
-    
-    <script type="text/javascript">
-        // Connect to the Socket.IO server
-        const socket =  io();
-
-        // Listen for 'connect' events and update the connection status
-        socket.on('connect', function() {
-            document.getElementById('connection').innerText = 'connected';
-            document.getElementById('connection').style.color = 'green';
-        });
-        socket.on('disconnect', function() {
-            document.getElementById('connection').innerText = 'disconnected';
-            document.getElementById('connection').style.color = 'red';
-        });
-        
-        // Listen for 'new_frame' events and update the image
-        socket.on('frame', function(data) {
-            console.log("frame")
-            document.getElementById('video').src = 'data:image/jpeg;base64,' + data;
-        });
-    </script>
 </body>
 </html>
