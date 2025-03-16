@@ -1,12 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Detection</title>
+    <script src="socket.io.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+<header>
+    <h1>Detection</h1>
+    <p id="connection">disconnected</p>
+</header>
 <body>
-    <h1>Software</h1>
-    <a href="camera_stream.html">Camera Stream</a>
+    <div style="position:relative;">
+        <img id="video" src="/video_feed"  alt="Camera Stream" style="display: block;">
+        <canvas id="overlay" style="position:absolute; top: 0; left: 0;"></canvas>
+    </div>
     <br>
-    <a href="detection.html">Detection</a>
+    Threshold: <input type="number" class="slider" id="threshold"><br>
+    Hysteresis: <input type="number" class="slider" id="hysteresis"><br>
+    P: <input type="number" class="slider" id="p"><br>
+    <button id="home">Home</button><br>
+    data:<br><samp id="data">NA</samp><br>
+   
+    <a hdef="/camera_stream.html">clean camera stream</a>
+    <script type="text/javascript">
+        // Connect to the Socket.IO server
+        const socket =  io();
+        var hysteresisthreshold = 0;
+        var hysteresis = 0;
+        var p = 0;
+
+        // Listen for 'connect' events and update the connection status
+        socket.on('connect', function() {
+            document.getElementById('connection').innerText = 'connected';
+            document.getElementById('connection').style.color = 'green';
+        });
+        socket.on('disconnect', function() {
+            document.getElementById('connection').innerText = 'disconnected';
+            document.getElementById('connection').style.color = 'red';
+        });
+
+        socket.on("data", function(data){
+            const parsedData = JSON.parse(data);
+            data_string = ""
+            for(key in parsedData){
+                data_string += key+": "+parsedData[key]+"\n"
+            }
+            document.getElementById('data').innerText = data_string;
+
+            if(parsedData["threshold"] != threshold){
+                threshold = parsedData["threshold"]
+                document.getElementById("threshold").value = threshold
+            }
+            if(parsedData["hysteresis"] != hysteresis){
+                hysteresis = parsedData["hysteresis"]
+                document.getElementById("hysteresis").value = hysteresis
+            }
+            if(parsedData["p"] != p){
+                p = parsedData["p"]
+                document.getElementById("p").value = p
+            }
+
+            const centerX = parsedData.center[0];
+            const centerY = parsedData.center[1];
+
+            const canvas = document.getElementById('overlay');
+            const context = canvas.getContext('2d');
+            const video = document.getElementById('video');
+            // Clear the canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            // Set canvas dimensions to match the video element
+            canvas.width = video.clientWidth;
+            canvas.height = video.clientHeight;
+            // Calculate the center coordinates in pixels
+            const centerXPixel = centerX * canvas.width;
+            const centerYPixel = centerY * canvas.height;
+            // draw a cross
+            context.strokeStyle = 'white';
+            if(parsedData.tracking){context.setLineDash([]);}
+            else{context.setLineDash([5, 15])}
+            context.beginPath();
+            context.moveTo(centerXPixel, 0);
+            context.lineTo(centerXPixel, canvas.height);
+            context.stroke();
+            context.beginPath();
+            context.moveTo(0, centerYPixel);
+            context.lineTo(canvas.width, centerYPixel);
+            context.stroke();
+        })
+        
+
+        document.getElementById("threshold").onchange = function(){
+            socket.emit("setting", JSON.stringify({ threshold: this.value}));
+        }
+        document.getElementById("hysteresis").onchange = function(){
+            socket.emit("setting", JSON.stringify({ hysteresis: this.value}));
+        }
+        document.getElementById("p").onchange = function(){
+            socket.emit("setting", JSON.stringify({ p: this.value}));
+        }
+
+        document.getElementById("home").onclick = function(){
+            socket.emit("home", "");
+        }
+    </script>
 </body>
 </html>

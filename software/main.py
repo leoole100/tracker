@@ -32,8 +32,10 @@ scale = 0.415
 f = cam()
 dg = det(f)
 p = 0.25
-threshold = 1e-2
+threshold = -20
+hysteresis = 30
 last = time.time()
+tracking = False
 
 pos = np.array([pi, pi])
 m1(pos[0])
@@ -43,24 +45,26 @@ time.sleep(0.2)
 
 
 def loop():
-    global f, dg, p, pos, last
+    global f, dg, p, pos, last, tracking, hysteresis
     f = cam()
     d = det(f)
-    tracking = False
-    if d["signal"] > threshold:
+    if (tracking and d["signal"] > threshold-hysteresis) or (not tracking and d["signal"] > threshold):
         tracking = True
         error = (d["center"]-np.array([0.5, 0.5]))*scale*[4/3, 1]
         pos[0] += p*error[0]
         m1(pos[0])
         pos[1] -= p*error[1] * - cos(pos[0])
         m2(pos[1])
+    else: tracking = False
     td = time.time() - last
     last = time.time()
     dg = {
         **d,
-        "threshold": threshold,
         "tracking": tracking,
-        "time": td
+        "time": td,
+        "threshold": threshold,
+        "hysteresis": hysteresis,
+        "p": p,
     }
     socketio.emit("data", json.dumps(dg))
 
@@ -74,8 +78,8 @@ def tracking_task():
         loop()
 
 # %%
-tracking = Thread(target=tracking_task)
-tracking.start()
+tracking_thread = Thread(target=tracking_task)
+tracking_thread.start()
 
 # %%
 # https://github.com/log0/video_streaming_with_flask_example
@@ -102,11 +106,24 @@ def video_feed():
 
 @socketio.on("setting")
 def on_setting(data):
-    global threshold
+    global threshold, hysteresis, p
     data = json.loads(data)
     print(data)
     if "threshold" in data:
         threshold = float(data["threshold"])
+    if "hysteresis" in data:
+        hysteresis = float(data["hysteresis"])
+    if "p" in data:
+        p = float(data["p"])
 
+@socketio.on("home")
+def on_setting(data):
+    global pos
+    pos = np.array([pi, pi])
+    m1(pos[0])
+    m2(pos[1])
+    
+print("starting server")
+# socketio.run(app, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)
 socketio.run(app, host='0.0.0.0', port=8080)
 # %%
