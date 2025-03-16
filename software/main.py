@@ -31,7 +31,7 @@ log.setLevel(logging.ERROR)
 scale = 0.415
 f = cam()
 dg = det(f)
-p = 0.1
+p = 0.25
 threshold = 1e-2
 last = time.time()
 
