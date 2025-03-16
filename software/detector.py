@@ -6,7 +6,7 @@ import math
 from glob import glob
 
 def log10_clamp(a):
-	if a<=0: return -math.inf
+	if a<=0: return -9999999999
 	return math.log10(a)
 
 class Detector():
@@ -29,9 +29,9 @@ class Detector():
 		self.w = np.exp(-self.w)
 		amax = np.unravel_index(self.w.argmax(), self.w.shape)
 		signal = log10_clamp(self.w[amax])*10
-		snr = log10_clamp(signal/np.mean(self.w))*10
+		# snr = log10_clamp(signal/np.mean(self.w))*10
 		return {
       		"center": (np.array(amax)/np.array(self.w.shape))[::-1].tolist(),
 			"signal": signal,
-			"snr": snr
+			# "snr": snr
 		}
