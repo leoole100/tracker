@@ -124,6 +124,5 @@ def on_setting(data):
     m2(pos[1])
     
 print("starting server")
-# socketio.run(app, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)
-socketio.run(app, host='0.0.0.0', port=8080)
+socketio.run(app, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)
 # %%
