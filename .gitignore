@@ -14,9 +14,6 @@ __pycache__
 *.run.xml
 *.blg
 *.bbl-SAVE-ERROR
-**/main.pdf
-
-
 
 *.kate-swp
 
