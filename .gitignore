@@ -1,3 +1,26 @@
 __pycache__
 .venv
 .vscode
+
+# latex files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.bbl
+*.bcf
+*.run.xml
+*.blg
+*.bbl-SAVE-ERROR
+**/main.pdf
+
+
+
+*.kate-swp
+
+**/literature
+
+# libreoffice locks
+*.~lock.*
