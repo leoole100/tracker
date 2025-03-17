@@ -13,17 +13,29 @@
 \title{Modular Tracking}
 \author{Leon Oleschko}
 \date{\dotdate\today}
-\sffamily\maketitle
+{\sffamily\maketitle}
 
-\section{Introduction}
-Real-time object tracking is a core challenge in computer vision and robotics. This project focuses on moving a camera to track a ping pong ball during gameplay, which presents a unique combination of steady ballistic flight and rapid, complex bounces at high speeds. These dynamics make it an interesting platform to explore and evaluate detection, tracking, and control strategies.
+Real-time object tracking is a core challenge in computer vision and robotics. Moving a camera to track a ping pong ball during gameplay creates an interesting platform to explore and evaluate detection, tracking, and control strategies. This is due to its unique combination of steady ballistic flight and rapid, complex bounces at high speeds.
 
-% \subsection{Requirements}
 To simplify the exploration of different strategies, the system is designed with modularity and accessibility in mind. Each component is built around high-level concepts, enabling users to experiment without requiring an in-depth engineering background.
 
 
 \section{Methods}
-\subsection{Hardware}
+The system is designed to track a ping pong ball in real time by moving a camera dynamically. To achieve this, the project is broken down into modular components, each addressing a specific aspect of the tracking process. 
+
+The hardware components consists of a camera, motors, motor controllers and a processing computer.\\
+For the camera a Raspberry Pi Camera V2 is used, as with the \href{https://github.com/raspberrypi/picamera2}{picamera2} software stack it supports a framerate of \SI{200}{Hz}.\\
+To move the camera 2 common stepper motors are mounted perpendicularly.
+They are driven with field oriented controllers with the \href{https://simplefoc.com/}{SimpleFOC} firmware stack.
+They are connected to the control computer using the Universal Serial Bus (USB).\\
+The chosen computer is a Raspberry Pi 5.
+
+To power the components \SI{9}{V}~\SI{3}{A} from a USB-C power supply are converted to a \SI{5}{V}~\SI{5}{A} bus for the computer and another \SI{5}{V}~\SI{3}{A} bus for the motors.
+Additionally the startup of the computer and the motors is staggered.
+This was necessary to achieve stable operation.
+
+To mount the components mechanically, they are designed as subrack modules.
+
 
 \subsection{Software}
 
