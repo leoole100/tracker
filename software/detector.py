@@ -13,8 +13,7 @@ class Detector():
 	# size = (160, 120)
 	size = (80, 60)
 	def __init__(self):
-		# templates = cv2.imread("../ball.png")
-		templates = [cv2.imread(p) for p in glob("/home/leon/tracker/*.png")]
+		templates = [cv2.imread(p) for p in glob("templates/*.png")]
 		templates_lab = [cv2.cvtColor(i, cv2.COLOR_BGR2HSV) for i in templates]
 		lab = np.concatenate([t.reshape(t.shape[0]*t.shape[1], 3) for t in templates_lab])
 		self.mean = np.mean(lab, axis=0)
