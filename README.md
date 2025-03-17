@@ -7,7 +7,8 @@ Real-time object tracking is a core challenge in computer vision and
 robotics. Moving a camera to track a ping pong ball during gameplay
 creates an interesting platform to explore and evaluate detection,
 tracking, and control strategies. This is due to its unique combination
-of steady ballistic flight and rapid, complex bounces at high speeds.
+of steady ballistic flight interrupted by rapid, complex bounces at high
+speeds.
 
 To simplify the exploration of different strategies, the system is
 designed with modularity and accessibility in mind. Each component is
@@ -23,8 +24,13 @@ process.
 
 ### Hardware
 
+<img src="hardware/assembly.png" width=500px>
+
 The hardware components consists of a camera, motors, motor controllers
 and a processing computer.\
+The modules are designed as subrack modules and can be assembled as
+shown in the figure above.
+
 For the camera a Raspberry Pi Camera V2 is used, as with the
 [picamera2](https://github.com/raspberrypi/picamera2) software stack it
 supports a framerate of 200 Hz. A normal 30 Hz USB Webcam was tested to
@@ -39,9 +45,6 @@ To power the components 9 V 3 A from a USB-C power supply are converted
 to a 5 V 5 A bus for the computer and another 5 V 3 A bus for the
 motors. Additionally the startup of the computer and the motors is
 staggered. This was necessary to achieve stable operation.
-
-To mount the components mechanically, they are designed as subrack
-modules.
 
 ### Software
 
