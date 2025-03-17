@@ -1,4 +1,5 @@
 # Modular Tracking
+Real-time detection, tracking, and control are fundamental to applications in robotics and automation. This project presents a modular, high-speed camera tracking system designed to explore detection, tracking, and control strategies by following a ping pong ball during gameplay. The system combines a Raspberry Pi Camera V2, stepper motors, and a Raspberry Pi 5, achieving real-time tracking at 200 fps through a modular Python-based software stack. The modular design and user-friendly interface make the system accessible for experimentation and learning, while its performance under controlled conditions demonstrates its potential for applications in robotics, sports analytics, and beyond.
 
 ### Introduction
 
@@ -42,7 +43,7 @@ staggered. This was necessary to achieve stable operation.
 To mount the components mechanically, they are designed as subrack
 modules.
 
-### Software {#software .unnumbered}
+### Software
 
 The software architecture is designed to be modular, ensuring
 flexibility and ease of experimentation. It is split into a camera
@@ -92,7 +93,29 @@ and responsive control for keeping the ball centered in the frame.
 
 ## Results
 
-In preliminary testing the simple approach works smoothly under
-controlled lighting conditions.
+The simple detection and tracking approach works smoothly under
+controlled lighting conditions and with a differently colored
+background. However, in uncontrolled lighting environments, the
+threshold for detection must be lowered to maintain sensitivity, which
+introduces false positives. Despite this limitation, the system
+demonstrates robust performance in ideal conditions, highlighting its
+potential for applications where lighting can be managed.
 
-## Conclusion and Outlook
+## Conclusion
+
+This project demonstrates the feasibility of a modular, high-speed
+camera tracking system for following a ping pong ball in real time. By
+combining a simple yet effective detection algorithm with a proportional
+controller, the system achieves reliable performance under controlled
+lighting conditions. The modular design allows for easy experimentation
+with different strategies, making it a versatile platform for learning
+and innovation in real-time object tracking.
+
+Future work could focus on improving robustness in uncontrolled lighting
+environments, such as by incorporating adaptive thresholding or machine
+learning-based detection methods. Additionally, expanding the system to
+include more advanced control strategies, like PID control or predictive
+tracking, could further enhance performance. The platform also holds
+potential for applications beyond ping pong, such as in robotics, sports
+analytics, or automated surveillance, making it a valuable tool for both
+education and research.
