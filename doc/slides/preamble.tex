@@ -1,0 +1,94 @@
+\setbeamertemplate{navigation symbols}{}
+\usepackage{xcolor}
+\definecolor{seeblau}{HTML}{00A9E0}
+\definecolor{seegrau}{HTML}{9AA0A7}
+
+\definecolor{seeblau1}{HTML}{CCEEF9}
+\definecolor{seeblau2}{HTML}{A6E1F4}
+\definecolor{seeblau3}{HTML}{59C7EB}
+\definecolor{seeblau4}{HTML}{00A9E0}
+\definecolor{seeblau5}{HTML}{008ECE}
+
+\setbeamercolor{title}{fg=seeblau}
+\setbeamercolor{frametitle}{fg=seeblau}
+\setbeamercolor{section in toc}{fg=seeblau}
+\setbeamercolor{structure}{fg=seeblau}
+
+\setbeamertemplate{footline}{%
+	\begin{beamercolorbox}[sep=.25cm,wd=\paperwidth,leftskip=0.25cm,rightskip=0.25cm]{footlinecolor}
+		\small
+		% \textbf{\insertsection}\quad\insertsubsection
+		% \hfill\insertframenumber
+	\end{beamercolorbox}%
+}
+
+\usepackage[overridenote]{pdfpc}
+
+\usepackage[english]{babel}
+\parskip=20pt
+
+\usepackage[sfdefault]{roboto}
+\usepackage{libertinust1math}
+\usefonttheme[onlymath]{serif}
+
+\usepackage{ifthen, adjustbox}
+\newcommand{\markieren}[4]{
+	\ifthenelse{\equal{#1}{}}{}{\adjustbox{padding=3pt, bgcolor=seeblau1, margin=-1pt}{\strut{\sffamily\robotoMedium{#1}}}\\}
+  \ifthenelse{\equal{#2}{}}{}{\adjustbox{padding=3pt, bgcolor=seeblau2, margin=-1pt}{\strut{\sffamily\robotoMedium{#2}}}\\}
+	\ifthenelse{\equal{#3}{}}{}{\adjustbox{padding=3pt, bgcolor=seeblau3, margin=-1pt}{\strut{\sffamily\robotoMedium{#3}}}\\}
+	\ifthenelse{\equal{#4}{}}{}{\adjustbox{padding=3pt, bgcolor=seeblau4, margin=-1pt}{\strut{\sffamily\robotoMedium{#4}}}}
+}
+
+\let\footnoterule\relax % removes bar
+\setbeamertemplate{footnote}{
+  \parindent 0em\noindent
+  \raggedleft
+  \usebeamercolor{footnote}\hbox to 0.8em{\hfil\insertfootnotemark}\tiny\insertfootnotetext\par%
+}
+
+\newcommand\blfootnote[1]{
+	\let\thefootnote\relax\footnotetext{#1}
+}
+
+\usepackage[
+	style=authortitle
+]{biblatex}
+\usepackage{ifthen}
+\newcommand{\customcite}[2][]{
+	\blfootnote{
+		\emph{\citetitle{#2}}, \citeauthor*{#2}	\citeyear{#2}
+		\ifthenelse{ \equal{#1}{} }{}{(#1)}
+	}
+}
+
+\newcommand{\highlightcite}[2][]{
+	\blfootnote{
+		\color{seeblau}
+		\small
+		\emph{\citetitle{#2}}, \citeauthor*{#2}	\citeyear{#2}
+		\ifthenelse{ \equal{#1}{} }{}{(#1)}
+	}
+}
+
+
+\usepackage[ddmmyyyy]{datetime}
+\renewcommand{\dateseparator}{.}
+
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+
+\usepackage{tikz}
+
+\newcommand{\slidefigure}[1]{
+{ % all template changes are local to this group.
+\setbeamertemplate{navigation symbols}{}
+\begin{frame}<article:0>[plain]
+	\begin{tikzpicture}[remember picture,overlay]
+		\node[at=(current page.center)] {
+			\includegraphics[keepaspectratio,
+								width=\paperwidth,
+								height=\paperheight]{#1}
+		};
+	\end{tikzpicture}
+	\end{frame}
+}
+}

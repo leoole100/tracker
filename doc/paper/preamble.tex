@@ -1,0 +1,140 @@
+\usepackage{xcolor}
+\definecolor{seeblau}{HTML}{00A9E0}
+\definecolor{seegrau}{HTML}{9AA0A7}
+
+\definecolor{seeblau1}{HTML}{CCEEF9}
+\definecolor{seeblau2}{HTML}{A6E1F4}
+\definecolor{seeblau3}{HTML}{59C7EB}
+\definecolor{seeblau4}{HTML}{00A9E0}
+\definecolor{seeblau5}{HTML}{008ECE}
+
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+\usepackage{microtype}
+\usepackage{siunitx}
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\usepackage{nicefrac}
+\usepackage[T1]{fontenc}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{parskip}
+
+\usepackage{libertinus, libertinust1math}
+\usepackage[sfdefault]{biolinum}
+\usepackage{roboto}
+
+\setkomafont{disposition}{\normalfont\sffamily}
+
+% set margins
+\usepackage{geometry}
+\geometry{
+	a4paper,
+	left=2.5cm,
+	right=2.5cm,
+	top=2.5cm,
+	bottom=2.5cm
+}
+
+% not recommended with KOMA-script
+% make table of contents sans-serif
+% \usepackage{tocloft}
+% \renewcommand\cftchappagefont{\normalfont}
+% \renewcommand\cftchapfont{\normalfont}
+% \renewcommand\cftchappresnum{\bfseries}
+% \renewcommand\cftchapaftersnum{}
+% \renewcommand{\cftchapfont}{\sffamily}
+% \renewcommand{\cftsecfont}{\sffamily}
+% \renewcommand{\cftsubsecfont}{\sffamily}
+% \renewcommand{\cftchappagefont}{\sffamily}
+% \renewcommand{\cftsecpagefont}{\sffamily}
+% \renewcommand{\cftsubsecpagefont}{\sffamily}
+
+% caption
+\usepackage{caption}
+\captionsetup{
+	% font={sf},
+	labelfont={sf, bf, color=seeblau},
+	labelsep=quad,
+	labelformat=simple,
+}
+
+% links
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=seeblau,
+	citecolor=seeblau,
+	urlcolor=seeblau,
+	% hidelinks=true
+}
+
+% bibliography
+\usepackage[
+	style=numeric-comp, % comp = compressed 4,5,6,7 -> 4-7
+	sorting=none,		% Sort by appearance
+	% autocite = superscript,
+	% backref=true,
+	hyperref=true,
+	url=true,
+	maxbibnames=100
+]{biblatex}
+
+\usepackage{float}
+% \floatplacement{figure}{h}
+% \floatplacement{table}{H}
+
+% loosen float placement rules
+\renewcommand{\topfraction}{0.8}
+\renewcommand{\bottomfraction}{.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{.9}
+% make floats less likely to be placed on a separate page
+\setcounter{totalnumber}{9}
+\setcounter{topnumber}{9}
+\setcounter{bottomnumber}{9}
+
+% decrease space between floats and text
+\setlength{\textfloatsep}{0.25cm}
+\setlength{\floatsep}{0.25cm}
+
+% decrease space after disposition
+\RedeclareSectionCommands[
+	afterskip=1px
+]{section, subsection, subsubsection}
+
+\usepackage{adjustbox}
+
+\usepackage{datetime}
+\newdateformat{dotdate}{
+	\twodigit{\THEDAY}.\twodigit{\THEMONTH}.\THEYEAR
+}
+\newdateformat{monthyeardate}{%
+  \monthname[\THEMONTH] \THEYEAR}
+
+
+% header and footer
+\usepackage[
+  markcase=noupper
+]{scrlayer-scrpage}% activates pagestyle scrheadings automatically
+\clearpairofpagestyles
+\setkomafont{pageheadfoot}{\normalfont\sffamily}
+\setkomafont{pagenumber}{\normalfont\sffamily}
+% \chead*{\color{seegrau} Draft \dotdate\today}
+\ofoot*{\pagemark}
+\ohead*{\rightmark}
+
+
+\usepackage{ifthen, adjustbox}
+\newcommand{\markieren}[4]{
+	\ifthenelse{\equal{#1}{}}{}{\adjustbox{padding=3pt, bgcolor=seeblau1, margin=-1pt}{\strut{\sffamily\robotoMedium{#1}}}\\}
+  \ifthenelse{\equal{#2}{}}{}{\adjustbox{padding=3pt, bgcolor=seeblau2, margin=-1pt}{\strut{\sffamily\robotoMedium{#2}}}\\}
+	\ifthenelse{\equal{#3}{}}{}{\adjustbox{padding=3pt, bgcolor=seeblau3, margin=-1pt}{\strut{\sffamily\robotoMedium{#3}}}\\}
+	\ifthenelse{\equal{#4}{}}{}{\adjustbox{padding=3pt, bgcolor=seeblau4, margin=-1pt}{\strut{\sffamily\robotoMedium{#4}}}}
+}

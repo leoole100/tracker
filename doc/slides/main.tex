@@ -1,0 +1,72 @@
+\documentclass[aspectratio=169, 20pt]{beamer}
+\input{preamble.tex}
+
+\author{Leon Oleschko}
+\date{\today}
+
+\begin{document}
+\begin{frame}
+	\large
+	\markieren{}{}{Modular Tracker}{following a ping pong ball}
+	
+	\vfill
+	\normalsize
+	Leon Oleschko\\
+	\today
+	
+	\vfill
+\end{frame}
+
+\begin{frame}{Demo}
+\end{frame}
+
+\section{Hardware}
+\slidefigure{../../figures/usb_webcam.png}
+\slidefigure{../../figures/rpicam.png}
+\slidefigure{../../figures/stepper.png}
+\slidefigure{../../figures/stepper_mounted.png}
+\slidefigure{../../figures/driver.png}
+\slidefigure{../../figures/computer.png}
+\slidefigure{../../figures/assembly.png}
+
+\section{Software}
+\slidefigure{../../figures/ball.png}
+\begin{frame}
+	\begin{gather*}
+		\adjincludegraphics[height=3.5cm, valign=c]{../../figures/ball.png}
+		= \\
+		\adjincludegraphics[height=4cm, valign=c]{../../figures/rgb.png}
+	\end{gather*}
+\end{frame}
+
+\begin{frame}
+	\begin{align*}
+		&\adjincludegraphics[height=3.5cm, valign=c]{../../figures/rgb.png}\\
+		\Rightarrow\; &\adjincludegraphics[height=3.5cm, valign=c]{../../figures/hsv.png}
+	\end{align*}
+\end{frame}
+
+\begin{frame}
+	\begin{gather*}
+		- \left(
+				\adjincludegraphics[height=2cm, valign=c]{../../figures/hsv.png} - \adjincludegraphics[height=2cm, valign=c]{../../figures/mean.png}
+		\right)^2\\
+	= \adjincludegraphics[height=3cm, valign=c]{../../figures/diff.png}
+	\end{gather*}
+\end{frame}
+
+\begin{frame}
+	\begin{gather*}
+		- \left|
+			\frac{
+				\adjincludegraphics[height=2cm, valign=c]{../../figures/diff.png}
+			}{(\sigma_H, \sigma_S, \sigma_V)}
+		\right|^2
+	= \adjincludegraphics[height=4cm, valign=c]{../../figures/weight.png}
+	\end{gather*}
+\end{frame}
+
+
+\begin{frame}
+\end{frame}
+\end{document}
