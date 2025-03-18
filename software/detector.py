@@ -13,7 +13,7 @@ class Detector():
 	# size = (160, 120)
 	size = (80, 60)
 	def __init__(self):
-		templates = [cv2.imread(p) for p in glob("templates/*.png")]
+		templates = [cv2.imread(p) for p in glob("*.png")]
 		templates_lab = [cv2.cvtColor(i, cv2.COLOR_BGR2HSV) for i in templates]
 		lab = np.concatenate([t.reshape(t.shape[0]*t.shape[1], 3) for t in templates_lab])
 		self.mean = np.mean(lab, axis=0)
@@ -24,7 +24,7 @@ class Detector():
 		self.f_small = cv2.resize(f, self.size)
 		self.fc = cv2.cvtColor(self.f_small, cv2.COLOR_RGB2HSV)
 		self.diff = self.fc - self.mean
-		self.w = np.mean(self.diff**2 / self.std, axis=2)
+		self.w = np.mean(self.diff**2 /self.std, axis=2)
 		self.w = np.exp(-self.w)
 		amax = np.unravel_index(self.w.argmax(), self.w.shape)
 		signal = log10_clamp(self.w[amax])*10
