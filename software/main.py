@@ -45,7 +45,7 @@ time.sleep(0.2)
 
 
 def loop():
-    global f, dg, p, pos, last, tracking, hysteresis
+    global f, dg, p, pos, last, tracking, hysteresis, det
     f = cam()
     d = det(f)
     if (tracking and d["signal"] > threshold-hysteresis) or (not tracking and d["signal"] > threshold):
@@ -65,6 +65,7 @@ def loop():
         "threshold": threshold,
         "hysteresis": hysteresis,
         "p": p,
+        "scale": det.scale
     }
     socketio.emit("data", json.dumps(dg))
 
@@ -106,7 +107,7 @@ def video_feed():
 
 @socketio.on("setting")
 def on_setting(data):
-    global threshold, hysteresis, p
+    global threshold, hysteresis, p, det
     data = json.loads(data)
     print(data)
     if "threshold" in data:
@@ -115,6 +116,8 @@ def on_setting(data):
         hysteresis = float(data["hysteresis"])
     if "p" in data:
         p = float(data["p"])
+    if "scale" in data:
+        det.scale = float(data["scale"])
 
 @socketio.on("home")
 def on_setting(data):

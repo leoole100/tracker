@@ -18,6 +18,7 @@
     Threshold: <input type="number" class="slider" id="threshold"><br>
     Hysteresis: <input type="number" class="slider" id="hysteresis"><br>
     P: <input type="number" class="slider" id="p"><br>
+    scale: <input type="number" class="slider" id="scale"><br>
     <button id="home">Home</button><br>
     data:<br><samp id="data">NA</samp><br>
    
@@ -28,6 +29,7 @@
         var hysteresisthreshold = 0;
         var hysteresis = 0;
         var p = 0;
+        var scale=0;
 
         // Listen for 'connect' events and update the connection status
         socket.on('connect', function() {
@@ -58,6 +60,10 @@
             if(parsedData["p"] != p){
                 p = parsedData["p"]
                 document.getElementById("p").value = p
+            }
+            if(parsedData["scale"] != scale){
+                scale = parsedData["scale"]
+                document.getElementById("scale").value = scale
             }
 
             const centerX = parsedData.center[0];
@@ -97,6 +103,9 @@
         }
         document.getElementById("p").onchange = function(){
             socket.emit("setting", JSON.stringify({ p: this.value}));
+        }
+        document.getElementById("scale").onchange = function(){
+            socket.emit("setting", JSON.stringify({ scale: this.value}));
         }
 
         document.getElementById("home").onclick = function(){
