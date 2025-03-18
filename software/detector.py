@@ -24,7 +24,7 @@ class Detector():
 		self.f_small = cv2.resize(f, self.size)
 		self.fc = cv2.cvtColor(self.f_small, cv2.COLOR_RGB2HSV)
 		self.diff = self.fc - self.mean
-		self.w = np.mean(self.diff**2 / 10*self.std^2, axis=2)
+		self.w = np.mean(self.diff**2 /self.std, axis=2)
 		self.w = np.exp(-self.w)
 		amax = np.unravel_index(self.w.argmax(), self.w.shape)
 		signal = log10_clamp(self.w[amax])*10
