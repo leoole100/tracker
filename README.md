@@ -2,6 +2,8 @@
 Real-time detection, tracking, and control are fundamental to applications in robotics and automation. This project presents a modular, high-speed camera tracking system designed to explore detection, tracking, and control strategies by following a ping pong ball during gameplay. The system combines a Raspberry Pi Camera V2, stepper motors, and a Raspberry Pi 5, achieving real-time tracking at 200 fps through a modular Python-based software stack. The modular design and user-friendly interface make the system accessible for experimentation and learning, while its performance under controlled conditions demonstrates its potential for applications in robotics, sports analytics, and beyond.
 
 [![Watch the video](https://img.youtube.com/vi/diDA-3Ysf_I/maxresdefault.jpg)](https://youtu.be/diDA-3Ysf_I)
+### [Watch this explanation on YouTube](https://youtu.be/diDA-3Ysf_I)
+
 
 ### Introduction
 
